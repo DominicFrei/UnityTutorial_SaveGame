@@ -13,40 +13,24 @@ public class PlayerPrefsExample : MonoBehaviour
 
     private void Awake()
     {
-        // Check if the key exists. If not, we never saved to it.
+        // Check if the key exists. If not, we never saved the hit count before.
         if (PlayerPrefs.HasKey(hitCountKey))
         {
+            // Read the hit count from the PlayerPrefs.
             hitCount = PlayerPrefs.GetInt(hitCountKey);
         }
-
-        int foo = PlayerPrefs.GetInt("int_key2");
-        Debug.Log(foo);
-
-        float bar = PlayerPrefs.GetFloat("float_key2");
-        Debug.Log(bar);
-
-        string doo = PlayerPrefs.GetString("string_key2");
-        Debug.Log(doo);
     }
 
     private void OnDestroy()
     {
+        // Set and save the hit count before destroying this game object.
         PlayerPrefs.SetInt(hitCountKey, hitCount);
         PlayerPrefs.Save();
-
-        PlayerPrefs.SetInt("string_key2", 55);
-        PlayerPrefs.SetFloat("string_key2", 55);
-        PlayerPrefs.SetString("string_key2", "55");
-        PlayerPrefs.Save();
-    }
-
-    private void OnApplicationQuit()
-    {
-        
     }
 
     private void OnMouseDown()
     {
+        // Increase the hit count by one each time we click the game object.
         hitCount++;
     }
 
