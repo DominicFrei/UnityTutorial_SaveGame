@@ -7,7 +7,19 @@ public class PlayerPrefsExample : MonoBehaviour
     // Resources:
     // https://docs.unity3d.com/ScriptReference/PlayerPrefs.html
 
+    #region Events
+
     [SerializeField] private int hitCount = 0;
+
+    private void OnMouseDown()
+    {
+        // Increase the hit count by one each time we click the game object.
+        hitCount++;
+    }
+
+    #endregion
+
+    #region Save / Load
 
     private readonly string hitCountKey = "HitCountKey";
 
@@ -28,10 +40,6 @@ public class PlayerPrefsExample : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    private void OnMouseDown()
-    {
-        // Increase the hit count by one each time we click the game object.
-        hitCount++;
-    }
+    #endregion
 
 }
