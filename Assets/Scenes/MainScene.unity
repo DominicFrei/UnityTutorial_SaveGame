@@ -314,6 +314,7 @@ GameObject:
   - component: {fileID: 1910535678}
   - component: {fileID: 1910535677}
   - component: {fileID: 1910535681}
+  - component: {fileID: 1910535682}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -413,3 +414,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitCount: 0
+--- !u!114 &1910535682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1910535675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b0af50192b120d489ca19397cae748b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitCountFileWriteAllText: 0
+  hitCountFileWriteAllLines: 0
+  hitCountFileStream: 0
+  hitCountFileStreamWriter: 0
+  hitCountFileStreamWriterFileStream: 0

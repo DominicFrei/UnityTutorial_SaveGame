@@ -5,78 +5,96 @@ using System.Text;
 
 public class FileStream_Example : MonoBehaviour
 {
+    // Resources:
+    // https://docs.microsoft.com/en-us/dotnet/api/system.io.file?view=net-5.0
+    // https://docs.microsoft.com/en-us/dotnet/api/system.io.filestream?view=net-5.0
+    // https://docs.microsoft.com/en-us/dotnet/api/system.io.streamwriter?view=net-5.0
+    // https://docs.microsoft.com/en-us/dotnet/api/system.io.binarywriter?view=net-5.0
+    // https://docs.microsoft.com/en-us/dotnet/api/system.io.binaryreader?view=net-5.0
+
     #region Hit Count
 
-    [SerializeField] private int hitCount = 0;
+    [SerializeField] private int hitCountFileWriteAllText = 0;
+    [SerializeField] private int hitCountFileWriteAllLines = 0;
+    [SerializeField] private int hitCountFileStream = 0;
+    [SerializeField] private int hitCountFileStreamWriter = 0;
+    [SerializeField] private int hitCountFileStreamWriterFileStream = 0;
 
     private void OnMouseDown()
     {
-        hitCount++;
+        hitCountFileWriteAllText++;
+        hitCountFileWriteAllLines++;
+        hitCountFileStream++;
+        hitCountFileStreamWriter++;
+        hitCountFileStreamWriterFileStream++;
     }
 
     #endregion
 
     #region Save / Load
 
-    private readonly string fileName = "FileStreamExample";
+    private readonly string fileWriteAllText = "fileWriteAllText.txt";
+    private readonly string fileWriteAllLines = "fileWriteAllLines.txt";
+    private readonly string fileFileStream = "fileFileStream.txt";
+    private readonly string fileStreamWriter = "fileStreamWriter.txt";
+    private readonly string fileStreamWriterFileStream = "fileStraemWriter2.txt";
 
     private void Awake()
     {
-        //Open the stream and read it back.
-        using (FileStream fs = File.OpenRead(fileName))
+        string textFileWriteAllText = File.ReadAllText(fileWriteAllText);
+        hitCountFileWriteAllText = Int32.Parse(textFileWriteAllText);
+
+        string textFileWriteAllLines = File.ReadAllText(fileWriteAllLines);
+        hitCountFileWriteAllLines = Int32.Parse(textFileWriteAllLines);
+
+        using FileStream fileStream = File.OpenRead(fileFileStream);
+        byte[] byteArray = new byte[1024];
+        UTF8Encoding utf8Encoding = new(true);
+        while (fileStream.Read(byteArray, 0, byteArray.Length) > 0)
         {
-            byte[] b = new byte[1024];
-            UTF8Encoding temp = new UTF8Encoding(true);
-            while (fs.Read(b, 0, b.Length) > 0)
-            {
-                Console.WriteLine(temp.GetString(b));
-            }
+            hitCountFileStream = Int32.Parse(utf8Encoding.GetString(byteArray));
         }
+
+        using StreamReader streamReader = new(fileStreamWriter);
+        string textStreamReader = streamReader.ReadLine();
+        hitCountFileStreamWriter = Int32.Parse(textStreamReader);
+
+        using StreamReader streamReader2 = new(fileStreamWriterFileStream);
+        string textStreamReader2 = streamReader2.ReadLine();
+        hitCountFileStreamWriterFileStream = Int32.Parse(textStreamReader2);
     }
 
     private void OnDestroy()
     {
-        // For testing purposes we just delete the file and recreate it with new data.
-        if (File.Exists(fileName))
-        {
-            File.Delete(fileName);
-        }
+        // Easiest way: using `File` directly.
+        // Overwrites the file. Opens and closes directly.
+        File.WriteAllText(fileWriteAllText, hitCountFileWriteAllText.ToString());
 
-        // Create a new file.
-        using FileStream fileStream = File.Create(fileName);
-        //AddText(fileStream, hitCount);
-        AddText(fileStream, "This is some text");
-        AddText(fileStream, "This is some more text,");
-        AddText(fileStream, "\r\nand this is on a new line");
-        AddText(fileStream, "\r\n\r\nThe following is a subset of characters:\r\n");
+        string[] stringArray = { hitCountFileWriteAllLines.ToString() };
+        // Overwrites the file. Overwrites the file. Opens and closes directly.
+        // Writes one line per array element.
+        File.WriteAllLines(fileWriteAllLines, stringArray);
 
-        for (int i = 1; i < 120; i++)
-        {
-            AddText(fileStream, Convert.ToChar(i).ToString());
-        }
+        // FileStream
+        // Can write multiple times. Streams are kept open until closed.
+        // Writes only bytes.
+        using FileStream fileStream = File.Create(fileFileStream);
+        byte[] byteArray = new UTF8Encoding(true).GetBytes(hitCountFileStream.ToString());
+        fileStream.Write(byteArray, 0, byteArray.Length);
 
-        File.WriteAllText(fileName, "50");
+        // StreamWriter
+        // Can write multiple times. Streams are kept open until closed.
+        using StreamWriter streamWriter = new(fileStreamWriter);
+        streamWriter.Write(hitCountFileStreamWriter.ToString());
 
-        var myInt = 50;
-        File.WriteAllText(fileName, myInt.ToString());
+        // StreamWriter with a FileStream
+        // Can write multiple times. Streams are kept open until closed.
+        // Offers more configuration possibilities for the StreamWriter.
+        using StreamWriter straemWriter2 = new(new FileStream(fileStreamWriterFileStream, FileMode.Create));
+        straemWriter2.Write(hitCountFileStreamWriterFileStream.ToString());
 
-        using (var writer = new StreamWriter(fileName))
-            writer.Write(myInt.ToString());
+        // BinaryWriter
 
-        using (var writer = new StreamWriter(new FileStream(fileName, FileMode.CreateNew)))
-            writer.Write(myInt.ToString());
-
-        using (var stream = new FileStream(fileName, FileMode.CreateNew))
-        {
-            var bytes = Encoding.UTF8.GetBytes(myInt.ToString());
-            stream.Write(bytes, 0, bytes.Length);
-        }
-    }
-
-    private static void AddText(FileStream fs, string value)
-    {
-        byte[] info = new UTF8Encoding(true).GetBytes(value);
-        fs.Write(info, 0, info.Length);
     }
 
     #endregion
